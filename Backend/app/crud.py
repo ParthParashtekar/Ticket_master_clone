@@ -6,14 +6,24 @@ from app.models import (
     Order, Ticket, UserEvent
 )
 
+def validate_required_fields(obj, required_fields: List[str]):
+    missing_fields = [field for field in required_fields if getattr(obj, field, None) is None]
+    if missing_fields:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Missing required fields: {', '.join(missing_fields)}"
+        )
+
 # CRUD Operations for User
 def create_user(session: Session, user: User) -> User:
+    validate_required_fields(user, ["email","firstName","lastName"])
     session.add(user)
     session.commit()
     session.refresh(user)
     return user
 
 def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
+    validate_required_fields(User, ["UserId"])
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -23,6 +33,7 @@ def get_all_users(session: Session) -> List[User]:
     return session.exec(select(User)).all()
 
 def update_user(session: Session, user_id: int, user_data: User) -> User:
+    validate_required_fields(user, ["UserId"])
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -39,6 +50,7 @@ def delete_user(session: Session, user_id: int) -> None:
 
 # CRUD Operations for Role
 def create_role(session: Session, role: Role) -> Role:
+    validate_required_fields(role, [])
     session.add(role)
     session.commit()
     session.refresh(role)
@@ -48,9 +60,10 @@ def get_all_roles(session: Session) -> List[Role]:
     return session.exec(select(Role)).all()
 
 def get_role_by_id(session: Session, role_id: int) -> Optional[Role]:
+    validate_required_fields(Role, ["RoleId"])
     role = session.get(Role, role_id)
     if not role:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="role not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Role not found")
     return role
 
 def update_role(session: Session, role_id: int, role_data: Role) -> Role:
@@ -70,6 +83,7 @@ def delete_role(session: Session, role_id:int) -> None:
 
 # CRUD Operations for Category
 def create_category(session: Session, category: Category) -> Category:
+    validate_required_fields(category, [])
     session.add(category)
     session.commit()
     session.refresh(category)
@@ -101,6 +115,7 @@ def delete_category(session: Session, category_id: int ) -> None:
 
 # CRUD Operations for SubCategory
 def create_subcategory(session: Session, subcategory: SubCategory) -> SubCategory:
+    validate_required_fields(subcategory, [])
     session.add(subcategory)
     session.commit()
     session.refresh(subcategory)
@@ -132,6 +147,7 @@ def delete_subcategory(session: Session, subcategory_id: int) -> None:
 
 # CRUD Operations for Venue
 def create_venue(session: Session, venue: Venue) -> Venue:
+    validate_required_fields(venue, [])
     session.add(venue)
     session.commit()
     session.refresh(venue)
@@ -163,6 +179,7 @@ def delete_venue(session: Session, venue_id: int) -> None:
 
 # CRUD Operations for Event
 def create_event(session: Session, event: Event) -> Event:
+    validate_required_fields(event, [])
     session.add(event)
     session.commit()
     session.refresh(event)
@@ -191,6 +208,7 @@ def delete_event(session: Session, event_id: int) -> None:
 
 # CRUD Operations for Seat
 def create_seat(session: Session, seat: Seat) -> Seat:
+    validate_required_fields(seat, [])
     session.add(seat)
     session.commit()
     session.refresh(seat)
@@ -222,6 +240,7 @@ def delete_seat(session: Session, seat_id: int) -> None:
 
 # CRUD Operations for Payment
 def create_payment(session: Session, payment: Payment) -> Payment:
+    validate_required_fields(payment, [])
     session.add(payment)
     session.commit()
     session.refresh(payment)
@@ -250,6 +269,7 @@ def delete_payment(session: Session, payment_id: int) -> None:
 
 # CRUD Operations for Order
 def create_order(session: Session, order: Order) -> Order:
+    validate_required_fields(order, [])
     session.add(order)
     session.commit()
     session.refresh(order)
@@ -278,6 +298,7 @@ def delete_order(session: Session, order_id: int) -> None:
 
 # CRUD Operations for Ticket
 def create_ticket(session: Session, ticket: Ticket) -> Ticket:
+    validate_required_fields(ticket, [])
     session.add(ticket)
     session.commit()
     session.refresh(ticket)
@@ -312,6 +333,7 @@ def delete_ticket(session: Session, ticket_id: int) -> None:
 
 # CRUD Operations for UserEvent (link between Users and Events)
 def add_user_event(session: Session, user_event: UserEvent) -> UserEvent:
+    validate_required_fields(user_event, [])
     session.add(user_event)
     session.commit()
     session.refresh(user_event)

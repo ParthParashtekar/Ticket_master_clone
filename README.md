@@ -1,10 +1,10 @@
 # Ticketmaster Clone
 
-This is the project for Database organisation cs-425-02, built using **FastAPI**, **SQLModel**, and **Alembic**. right now all the crud operations are developed for the project
+This is the project for Database organisation CS-425-02, built using **FastAPI**, **SQLModel**, and **Alembic**. For now all the crud operations are developed for the project.
 
 ## Project Setup
 
-Follow the instructions below to set up and run the project locally.
+Please follow the instructions below to set up and run the project locally.
 
 ### Prerequisites
 

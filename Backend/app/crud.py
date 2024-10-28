@@ -32,7 +32,19 @@ def validate_required_fields(obj, required_fields: List[str]):
 # CRUD Operations for User
 # CREATE
 def create_user(session: Session, user: User) -> User:
-    validate_required_fields(user, ["Email", "FirstName", "LastName"])
+    # validations
+    validate_required_fields(
+        user,
+        [
+            "Email",
+            "FirstName",
+            "LastName",
+            "DateOfBirth",
+            "PasswordHash",
+            "RoleID",
+            "UserID",
+        ],
+    )
 
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
@@ -85,7 +97,7 @@ def delete_user(session: Session, user_id: int) -> None:
 
 # CRUD Operations for Role
 def create_role(session: Session, role: Role) -> Role:
-    validate_required_fields(role, [])
+    validate_required_fields(role, ["Name", "RoleID"])
     session.add(role)
     session.commit()
     session.refresh(role)
@@ -126,7 +138,7 @@ def delete_role(session: Session, role_id: int) -> None:
 
 # CRUD Operations for Category
 def create_category(session: Session, category: Category) -> Category:
-    validate_required_fields(category, [])
+    validate_required_fields(category, ["CategoryID", "Name"])
     session.add(category)
     session.commit()
     session.refresh(category)
@@ -169,7 +181,7 @@ def delete_category(session: Session, category_id: int) -> None:
 
 # CRUD Operations for SubCategory
 def create_subcategory(session: Session, subcategory: SubCategory) -> SubCategory:
-    validate_required_fields(subcategory, [])
+    validate_required_fields(subcategory, ["SubCategoryID", "CategoryID", "Name"])
     session.add(subcategory)
     session.commit()
     session.refresh(subcategory)
@@ -214,7 +226,10 @@ def delete_subcategory(session: Session, subcategory_id: int) -> None:
 
 # CRUD Operations for Venue
 def create_venue(session: Session, venue: Venue) -> Venue:
-    validate_required_fields(venue, [])
+    validate_required_fields(
+        venue,
+        ["VenueID", "Name", "Location", "Capacity", "PhoneNumber", "Email", "Type"],
+    )
     session.add(venue)
     session.commit()
     session.refresh(venue)
@@ -255,7 +270,10 @@ def delete_venue(session: Session, venue_id: int) -> None:
 
 # CRUD Operations for Event
 def create_event(session: Session, event: Event) -> Event:
-    validate_required_fields(event, [])
+    validate_required_fields(
+        event,
+        ["EventID", "Name", "Date", "Status", "TotalTickets", "CategoryID", "VenueID"],
+    )
     session.add(event)
     session.commit()
     session.refresh(event)
@@ -292,7 +310,7 @@ def delete_event(session: Session, event_id: int) -> None:
 
 # CRUD Operations for Seat
 def create_seat(session: Session, seat: Seat) -> Seat:
-    validate_required_fields(seat, [])
+    validate_required_fields(seat, ["SeatID", "SeatNumber", "VenueID"])
     session.add(seat)
     session.commit()
     session.refresh(seat)
@@ -333,7 +351,9 @@ def delete_seat(session: Session, seat_id: int) -> None:
 
 # CRUD Operations for Payment
 def create_payment(session: Session, payment: Payment) -> Payment:
-    validate_required_fields(payment, [])
+    validate_required_fields(
+        payment, ["PaymentID", "PaymentMethod", "Status", "Amount"]
+    )
     session.add(payment)
     session.commit()
     session.refresh(payment)
@@ -370,7 +390,7 @@ def delete_payment(session: Session, payment_id: int) -> None:
 
 # CRUD Operations for Order
 def create_order(session: Session, order: Order) -> Order:
-    validate_required_fields(order, [])
+    validate_required_fields(order, ["OrderID", "TotalAmount", "PaymentID"])
     session.add(order)
     session.commit()
     session.refresh(order)
@@ -407,7 +427,9 @@ def delete_order(session: Session, order_id: int) -> None:
 
 # CRUD Operations for Ticket
 def create_ticket(session: Session, ticket: Ticket) -> Ticket:
-    validate_required_fields(ticket, [])
+    validate_required_fields(
+        ticket, ["TicketID", "Number", "Amount", "OrderID", "SeatID"]
+    )
     session.add(ticket)
     session.commit()
     session.refresh(ticket)

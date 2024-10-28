@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlmodel import Session, select
 from typing import List, Optional
 from fastapi import HTTPException, status
@@ -16,6 +17,7 @@ from app.models import (
 )
 
 
+# Common function to check required fields
 def validate_required_fields(obj, required_fields: List[str]):
     missing_fields = [
         field for field in required_fields if getattr(obj, field, None) is None
@@ -28,14 +30,24 @@ def validate_required_fields(obj, required_fields: List[str]):
 
 
 # CRUD Operations for User
+# CREATE
 def create_user(session: Session, user: User) -> User:
     validate_required_fields(user, ["Email", "FirstName", "LastName"])
+
+    if isinstance(user.DateOfBirth, str):
+        user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
+    if user.CreatedAt == "":
+        user.CreatedAt = None
+    if user.UpdatedAt == "":
+        user.UpdatedAt = None
+
     session.add(user)
     session.commit()
     session.refresh(user)
     return user
 
 
+# READ
 def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
     user = session.get(User, user_id)
     if not user:
@@ -49,8 +61,9 @@ def get_all_users(session: Session) -> List[User]:
     return session.exec(select(User)).all()
 
 
+# UPDATE
 def update_user(session: Session, user_id: int, user_data: User) -> User:
-    validate_required_fields(user, ["UserId"])
+    validate_required_fields(user_data, ["UserID"])
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
@@ -63,8 +76,8 @@ def update_user(session: Session, user_id: int, user_data: User) -> User:
     return user
 
 
+# DELETE
 def delete_user(session: Session, user_id: int) -> None:
-    validate_required_fields(user, ["UserId"])
     user = get_user_by_id(session, user_id)
     session.delete(user)
     session.commit()

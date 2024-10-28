@@ -67,10 +67,13 @@ from app.crud import (
     update_user_event,
 )
 
+# Initializing APIRouter for handling API routes
 router = APIRouter()
 
 
+# API Controller
 # User APIs
+# Tags are used to categorize endpoints in API documentation
 @router.post("/users/", response_model=User, tags=["Users"])
 def api_create_user(user: User, session: Session = Depends(get_session)):
     return create_user(session, user)
@@ -79,6 +82,7 @@ def api_create_user(user: User, session: Session = Depends(get_session)):
 @router.get("/users/{user_id}", response_model=User, tags=["Users"])
 def api_get_user(user_id: int, session: Session = Depends(get_session)):
     user = get_user_by_id(session, user_id)
+    # Error handling
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

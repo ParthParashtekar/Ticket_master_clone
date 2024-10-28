@@ -1,13 +1,16 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date, timezone
 
 
+# List of Schema Models
+# Defining a Role model representing role table in the database
 class Role(SQLModel, table=True):
     RoleID: Optional[int] = Field(default=None, primary_key=True)
     Name: str
 
 
+# Inherits from SQLModel and set table=True is to create a database table
 class User(SQLModel, table=True):
     UserID: Optional[int] = Field(default=None, primary_key=True)
     Email: str = Field(index=True)
@@ -17,11 +20,18 @@ class User(SQLModel, table=True):
     CountryOfResidence: Optional[str] = None
     ZipCode: Optional[int] = None
     PasswordHash: str
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
-    UpdatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )  # Automatically set the created date and time to the current UTC time when a user is created
+    UpdatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"onupdate": datetime.now(timezone.utc)},
+    )
     IsActive: bool = Field(default=True)
-    DateOfBirth: Optional[datetime] = None
-    RoleID: Optional[int] = Field(foreign_key="role.RoleID")
+    DateOfBirth: Optional[date] = None
+    RoleID: Optional[int] = Field(
+        foreign_key="role.RoleID"
+    )  # Foreign key linking to RoleID in Role table to associate user with a role
 
 
 class Category(SQLModel, table=True):
@@ -50,12 +60,15 @@ class Event(SQLModel, table=True):
     Name: str
     Description: Optional[str] = None
     ImageUrl: Optional[str] = None
-    Date: datetime
+    Date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     Status: Optional[str] = None
     TotalTickets: int
     AvailableTickets: int
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
-    UpdatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    UpdatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"onupdate": datetime.now(timezone.utc)},
+    )
     CategoryID: Optional[int] = Field(foreign_key="category.CategoryID")
     VenueID: Optional[int] = Field(foreign_key="venue.VenueID")
 
@@ -73,13 +86,13 @@ class Payment(SQLModel, table=True):
     PaymentMethod: Optional[str] = None
     Status: Optional[str] = None
     Amount: float
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Order(SQLModel, table=True):
     OrderID: Optional[int] = Field(default=None, primary_key=True)
     TotalAmount: float
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     UserID: Optional[int] = Field(foreign_key="user.UserID")
     PaymentID: Optional[int] = Field(foreign_key="payment.PaymentID")
 

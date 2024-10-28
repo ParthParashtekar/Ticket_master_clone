@@ -23,6 +23,8 @@ def validate_required_fields(obj, required_fields: List[str]):
         field for field in required_fields if getattr(obj, field, None) is None
     ]
     if missing_fields:
+        # Exception Handling is done here
+        # Raise an HTTP 422 error if required fields are missing, detailing which fields are absent
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Missing required fields: {', '.join(missing_fields)}",
@@ -32,7 +34,19 @@ def validate_required_fields(obj, required_fields: List[str]):
 # CRUD Operations for User
 # CREATE
 def create_user(session: Session, user: User) -> User:
-    validate_required_fields(user, ["Email", "FirstName", "LastName"])
+    # validations
+    validate_required_fields(
+        user,
+        [
+            "Email",
+            "FirstName",
+            "LastName",
+            "DateOfBirth",
+            "PasswordHash",
+            "RoleID",
+            "UserID",
+        ],
+    )
 
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
@@ -50,6 +64,8 @@ def create_user(session: Session, user: User) -> User:
 # READ
 def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
     user = session.get(User, user_id)
+    # Exception Handling
+    # To raise an exception if the user is not found in the database
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -65,6 +81,8 @@ def get_all_users(session: Session) -> List[User]:
 def update_user(session: Session, user_id: int, user_data: User) -> User:
     validate_required_fields(user_data, ["UserID"])
     user = session.get(User, user_id)
+    # Exception Handling
+    # To raise an exception if the user is not found in the database
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -85,7 +103,7 @@ def delete_user(session: Session, user_id: int) -> None:
 
 # CRUD Operations for Role
 def create_role(session: Session, role: Role) -> Role:
-    validate_required_fields(role, [])
+    validate_required_fields(role, ["Name", "RoleID"])
     session.add(role)
     session.commit()
     session.refresh(role)
@@ -98,6 +116,8 @@ def get_all_roles(session: Session) -> List[Role]:
 
 def get_role_by_id(session: Session, role_id: int) -> Optional[Role]:
     role = session.get(Role, role_id)
+    # Exception Handling
+    # To raise an exception if the role is not found in the database
     if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"
@@ -126,7 +146,7 @@ def delete_role(session: Session, role_id: int) -> None:
 
 # CRUD Operations for Category
 def create_category(session: Session, category: Category) -> Category:
-    validate_required_fields(category, [])
+    validate_required_fields(category, ["CategoryID", "Name"])
     session.add(category)
     session.commit()
     session.refresh(category)
@@ -169,7 +189,7 @@ def delete_category(session: Session, category_id: int) -> None:
 
 # CRUD Operations for SubCategory
 def create_subcategory(session: Session, subcategory: SubCategory) -> SubCategory:
-    validate_required_fields(subcategory, [])
+    validate_required_fields(subcategory, ["SubCategoryID", "CategoryID", "Name"])
     session.add(subcategory)
     session.commit()
     session.refresh(subcategory)
@@ -214,7 +234,10 @@ def delete_subcategory(session: Session, subcategory_id: int) -> None:
 
 # CRUD Operations for Venue
 def create_venue(session: Session, venue: Venue) -> Venue:
-    validate_required_fields(venue, [])
+    validate_required_fields(
+        venue,
+        ["VenueID", "Name", "Location", "Capacity", "PhoneNumber", "Email", "Type"],
+    )
     session.add(venue)
     session.commit()
     session.refresh(venue)
@@ -255,7 +278,10 @@ def delete_venue(session: Session, venue_id: int) -> None:
 
 # CRUD Operations for Event
 def create_event(session: Session, event: Event) -> Event:
-    validate_required_fields(event, [])
+    validate_required_fields(
+        event,
+        ["EventID", "Name", "Date", "Status", "TotalTickets", "CategoryID", "VenueID"],
+    )
     session.add(event)
     session.commit()
     session.refresh(event)
@@ -292,7 +318,7 @@ def delete_event(session: Session, event_id: int) -> None:
 
 # CRUD Operations for Seat
 def create_seat(session: Session, seat: Seat) -> Seat:
-    validate_required_fields(seat, [])
+    validate_required_fields(seat, ["SeatID", "SeatNumber", "VenueID"])
     session.add(seat)
     session.commit()
     session.refresh(seat)
@@ -333,7 +359,9 @@ def delete_seat(session: Session, seat_id: int) -> None:
 
 # CRUD Operations for Payment
 def create_payment(session: Session, payment: Payment) -> Payment:
-    validate_required_fields(payment, [])
+    validate_required_fields(
+        payment, ["PaymentID", "PaymentMethod", "Status", "Amount"]
+    )
     session.add(payment)
     session.commit()
     session.refresh(payment)
@@ -370,7 +398,7 @@ def delete_payment(session: Session, payment_id: int) -> None:
 
 # CRUD Operations for Order
 def create_order(session: Session, order: Order) -> Order:
-    validate_required_fields(order, [])
+    validate_required_fields(order, ["OrderID", "TotalAmount", "PaymentID"])
     session.add(order)
     session.commit()
     session.refresh(order)
@@ -407,7 +435,9 @@ def delete_order(session: Session, order_id: int) -> None:
 
 # CRUD Operations for Ticket
 def create_ticket(session: Session, ticket: Ticket) -> Ticket:
-    validate_required_fields(ticket, [])
+    validate_required_fields(
+        ticket, ["TicketID", "Number", "Amount", "OrderID", "SeatID"]
+    )
     session.add(ticket)
     session.commit()
     session.refresh(ticket)

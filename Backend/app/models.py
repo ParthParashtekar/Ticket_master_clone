@@ -17,8 +17,11 @@ class User(SQLModel, table=True):
     CountryOfResidence: Optional[str] = None
     ZipCode: Optional[int] = None
     PasswordHash: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc)) 
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), sa_column_kwargs={"onupdate": datetime.now(timezone.utc)})
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    UpdatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"onupdate": datetime.now(timezone.utc)},
+    )
     IsActive: bool = Field(default=True)
     DateOfBirth: Optional[date] = None
     RoleID: Optional[int] = Field(foreign_key="role.RoleID")
@@ -50,12 +53,15 @@ class Event(SQLModel, table=True):
     Name: str
     Description: Optional[str] = None
     ImageUrl: Optional[str] = None
-    Date: datetime
+    Date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     Status: Optional[str] = None
     TotalTickets: int
     AvailableTickets: int
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
-    UpdatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    UpdatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column_kwargs={"onupdate": datetime.now(timezone.utc)},
+    )
     CategoryID: Optional[int] = Field(foreign_key="category.CategoryID")
     VenueID: Optional[int] = Field(foreign_key="venue.VenueID")
 
@@ -73,13 +79,13 @@ class Payment(SQLModel, table=True):
     PaymentMethod: Optional[str] = None
     Status: Optional[str] = None
     Amount: float
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Order(SQLModel, table=True):
     OrderID: Optional[int] = Field(default=None, primary_key=True)
     TotalAmount: float
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
+    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     UserID: Optional[int] = Field(foreign_key="user.UserID")
     PaymentID: Optional[int] = Field(foreign_key="payment.PaymentID")
 

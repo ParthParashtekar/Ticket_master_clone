@@ -3,11 +3,14 @@ from typing import Optional
 from datetime import datetime, date, timezone
 
 
+# List of Schema Models
+# Defining a Role model representing role table in the database
 class Role(SQLModel, table=True):
     RoleID: Optional[int] = Field(default=None, primary_key=True)
     Name: str
 
 
+# Inherits from SQLModel and set table=True is to create a database table
 class User(SQLModel, table=True):
     UserID: Optional[int] = Field(default=None, primary_key=True)
     Email: str = Field(index=True)
@@ -17,14 +20,18 @@ class User(SQLModel, table=True):
     CountryOfResidence: Optional[str] = None
     ZipCode: Optional[int] = None
     PasswordHash: str
-    CreatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    CreatedAt: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )  # Automatically set the created date and time to the current UTC time when a user is created
     UpdatedAt: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         sa_column_kwargs={"onupdate": datetime.now(timezone.utc)},
     )
     IsActive: bool = Field(default=True)
     DateOfBirth: Optional[date] = None
-    RoleID: Optional[int] = Field(foreign_key="role.RoleID")
+    RoleID: Optional[int] = Field(
+        foreign_key="role.RoleID"
+    )  # Foreign key linking to RoleID in Role table to associate user with a role
 
 
 class Category(SQLModel, table=True):

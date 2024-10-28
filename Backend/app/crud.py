@@ -23,6 +23,8 @@ def validate_required_fields(obj, required_fields: List[str]):
         field for field in required_fields if getattr(obj, field, None) is None
     ]
     if missing_fields:
+        # Exception Handling is done here
+        # Raise an HTTP 422 error if required fields are missing, detailing which fields are absent
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Missing required fields: {', '.join(missing_fields)}",
@@ -62,6 +64,8 @@ def create_user(session: Session, user: User) -> User:
 # READ
 def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
     user = session.get(User, user_id)
+    # Exception Handling
+    # To raise an exception if the user is not found in the database
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -77,6 +81,8 @@ def get_all_users(session: Session) -> List[User]:
 def update_user(session: Session, user_id: int, user_data: User) -> User:
     validate_required_fields(user_data, ["UserID"])
     user = session.get(User, user_id)
+    # Exception Handling
+    # To raise an exception if the user is not found in the database
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -110,6 +116,8 @@ def get_all_roles(session: Session) -> List[Role]:
 
 def get_role_by_id(session: Session, role_id: int) -> Optional[Role]:
     role = session.get(Role, role_id)
+    # Exception Handling
+    # To raise an exception if the role is not found in the database
     if not role:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Role not found"

@@ -34,6 +34,11 @@ def create_user(session: Session, user: User) -> User:
 
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
+    if user.created_at == '':
+        user.created_at = None
+    if user.updated_at == '':
+        user.updated_at = None
+        
     session.add(user)
     session.commit()
     session.refresh(user)

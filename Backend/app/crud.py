@@ -34,11 +34,11 @@ def create_user(session: Session, user: User) -> User:
 
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
-    if user.created_at == '':
-        user.created_at = None
-    if user.updated_at == '':
-        user.updated_at = None
-        
+    if user.CreatedAt == "":
+        user.CreatedAt = None
+    if user.UpdatedAt == "":
+        user.UpdatedAt = None
+
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -59,7 +59,7 @@ def get_all_users(session: Session) -> List[User]:
 
 
 def update_user(session: Session, user_id: int, user_data: User) -> User:
-    validate_required_fields(user, ["UserId"])
+    validate_required_fields(user_data, ["UserID"])
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
@@ -73,7 +73,6 @@ def update_user(session: Session, user_id: int, user_data: User) -> User:
 
 
 def delete_user(session: Session, user_id: int) -> None:
-    validate_required_fields(user, ["UserId"])
     user = get_user_by_id(session, user_id)
     session.delete(user)
     session.commit()

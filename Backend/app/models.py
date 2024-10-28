@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date, timezone
 
 
 class Role(SQLModel, table=True):
@@ -17,10 +17,10 @@ class User(SQLModel, table=True):
     CountryOfResidence: Optional[str] = None
     ZipCode: Optional[int] = None
     PasswordHash: str
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
-    UpdatedAt: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc)) 
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), sa_column_kwargs={"onupdate": datetime.now(timezone.utc)})
     IsActive: bool = Field(default=True)
-    DateOfBirth: Optional[datetime] = None
+    DateOfBirth: Optional[date] = None
     RoleID: Optional[int] = Field(foreign_key="role.RoleID")
 
 

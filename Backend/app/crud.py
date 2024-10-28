@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlmodel import Session, select
 from typing import List, Optional
 from fastapi import HTTPException, status
@@ -30,6 +31,9 @@ def validate_required_fields(obj, required_fields: List[str]):
 # CRUD Operations for User
 def create_user(session: Session, user: User) -> User:
     validate_required_fields(user, ["Email", "FirstName", "LastName"])
+
+    if isinstance(user.DateOfBirth, str):
+        user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
     session.add(user)
     session.commit()
     session.refresh(user)

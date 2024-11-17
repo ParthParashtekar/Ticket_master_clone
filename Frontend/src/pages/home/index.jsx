@@ -12,8 +12,16 @@ import {
 } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
 import { EventCard } from "../../components/eventCard";
+import useEventStore from "../../store/eventStore";
 
 const Home = () => {
+  const { fetchAllEvents, events, loading, error } = useEventStore();
+
+  // Fetch all events when the component mounts
+  useEffect(() => {
+    fetchAllEvents();
+  }, [fetchAllEvents]);
+
   return (
     <Flex w="100%" flexDirection={"column"}>
       <Flex
@@ -66,6 +74,8 @@ const Home = () => {
           </Button>
         </Flex>
       </Flex>
+
+      {/* Events Section */}
       <Flex
         w={"100%"}
         flexWrap={"wrap"}
@@ -73,9 +83,24 @@ const Home = () => {
         gap={"4"}
         justifyContent={"space-around"}
       >
-        <EventCard />
-        <EventCard />
-        <EventCard />
+        {loading && <Text>Loading...</Text>}
+        {error && <Text>Error loading events</Text>}
+
+        {!loading && !error && events.length > 0 ? (
+          events.map((event) => (
+            <EventCard
+              key={event.id}
+              title={event.name}
+              description={event.description}
+              venue={event.venue}
+              date={event.date}
+              eventID={event.eventID}
+              // Pass other necessary props to EventCard
+            />
+          ))
+        ) : (
+          <Text>No events available</Text>
+        )}
       </Flex>
     </Flex>
   );

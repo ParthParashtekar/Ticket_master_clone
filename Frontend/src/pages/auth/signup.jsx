@@ -9,8 +9,47 @@ import {
   Link,
   Select,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import useAuthStore from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    country: "",
+    zipCode: "",
+    dateOfBirth: "",
+    phoneNumber: "",
+  });
+
+  const { signup, loading } = useAuthStore();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Submit", formData);
+    try {
+      await signup(formData);
+      alert("Signup successful!");
+      // Redirect or take further action after successful signup
+      navigate("/");
+    } catch (error) {
+      alert("Error during signup.");
+    }
+  };
+
   return (
     <Flex
       minH="100vh"
@@ -85,26 +124,76 @@ function SignUp() {
           </Text>
 
           {/* Form */}
-          <Box as="form">
+          <Box as="form" onSubmit={handleSubmit}>
             {/* Email */}
-            <Input placeholder="Email" mb={4} />
+            <Input
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              mb={4}
+              onChange={handleChange}
+            />
 
             {/* Password */}
-            <Input placeholder="Password" type="password" mb={4} />
+            <Input
+              placeholder="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              mb={4}
+              onChange={handleChange}
+            />
 
             {/* First Name / Last Name */}
             <Flex gap={4} mb={4}>
-              <Input placeholder="First Name" />
-              <Input placeholder="Last Name" />
+              <Input
+                name="firstName"
+                value={formData.firstName}
+                placeholder="First Name"
+                onChange={handleChange}
+              />
+              <Input
+                name="lastName"
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+            </Flex>
+
+            <Flex gap={4} mb={4}>
+              <Input
+                placeholder="Date of Birth (MM/DD/YYYY)"
+                name="dateOfBirth"
+                type="date" // Date input type for better UX
+                value={formData.dateOfBirth}
+                onChange={handleChange}
+              />
+              <Input
+                placeholder="Phone Number"
+                name="phoneNumber"
+                type="tel" // Tel input type for phone number validation
+                value={formData.phoneNumber}
+                onChange={handleChange}
+              />
             </Flex>
 
             {/* Country of Residence / Zip Code */}
-            <Flex gap={4} mb={6}>
-              <Select placeholder="Country of Residence">
+            <Flex gap={4} mb={4}>
+              <Select
+                placeholder="Country of Residence"
+                onChange={handleChange}
+                name="country"
+                value={formData.country}
+              >
                 <option value="US">United States</option>
                 {/* Add more countries as needed */}
               </Select>
-              <Input placeholder="Zip/Postal Code" />
+              <Input
+                name="zipCode"
+                value={formData.zipCode}
+                placeholder="Zip/Postal Code"
+                onChange={handleChange}
+              />
             </Flex>
 
             {/* Agree to Terms */}
@@ -114,8 +203,13 @@ function SignUp() {
             </Checkbox>
 
             {/* Sign Up Button */}
-            <Button colorScheme="blue" w="full">
-              Next
+            <Button
+              colorScheme="blue"
+              w="full"
+              isLoading={loading}
+              type="submit"
+            >
+              Sign Up
             </Button>
 
             {/* Terms of Use and Privacy Policy */}

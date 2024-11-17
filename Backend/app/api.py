@@ -37,6 +37,8 @@ from app.crud import (
     delete_venue,
     create_event,
     get_event_by_id,
+    get_events_by_category_id,
+    get_events_by_event_ids,
     delete_event,
     create_seat,
     get_all_seats,
@@ -259,6 +261,12 @@ def api_get_event(event_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Event not found")
     return event
 
+@router.get("/events/byCategory/{category_id}", response_model=list[Event], tags=["Events"])
+def api_get_events_by_category_id(category_id: int, session: Session = Depends(get_session)):
+    events = get_events_by_category_id(session, category_id)
+    if not events:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return events
 
 @router.put("/events/{event_id}", response_model=Event, tags=["Events"])
 def api_update_event(
@@ -412,3 +420,13 @@ def api_update_user_event(
     session: Session = Depends(get_session),
 ):
     return update_user_event(session, user_id, event_id, user_event)
+
+@router.get("/event_list_by_user_id/{user_id}", response_model = list[Event], tags=["UserEvents"])
+def api_get_event_list_by_user_id(user_id:int, session:Session=Depends(get_session)):
+    event_id_list = get_user_events_by_user_id(session, user_id)
+    if not event_id_list:
+        raise HTTPException(status_code=404, detail="No events found for this user")
+    events = get_events_by_event_ids(session, event_id_list)
+    if not events:
+        raise HTTPException(status_code=404, detail="No events found for this user")
+    return events

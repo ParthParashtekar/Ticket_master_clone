@@ -43,11 +43,10 @@ def create_user(session: Session, user: User) -> User:
             "LastName",
             "DateOfBirth",
             "PasswordHash",
-            "RoleID",
-            "UserID",
         ],
     )
-
+    if not user.RoleID:
+        user.RoleID = 1 
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
     if user.CreatedAt == "":

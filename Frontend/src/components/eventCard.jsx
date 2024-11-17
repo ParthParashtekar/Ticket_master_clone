@@ -3,14 +3,14 @@ import { FaChevronRight } from "react-icons/fa";
 
 import { useState } from "react";
 
-export const EventCard = () => {
+export const EventCard = (props) => {
   const [isHovered, setIsHovered] = useState(false);
   return (
     <Link
       w={{ sm: "100%", md: "45%", lg: "45%", xl: "45%" }}
       minWidth={"300px"}
       borderRadius={"5"}
-      href="/events/123"
+      href={`/events/${eventID}`}
     >
       <VStack
         textAlign={"start"}
@@ -68,9 +68,9 @@ export const EventCard = () => {
           )}
         </Flex>
         <Flex w="100%" textAlign={"start"} flexDirection={"column"} p={"2"}>
-          <Text>Info about the event</Text>
+          <Text>{props.description}</Text>
           <Text fontSize="lg" fontWeight="bold" color="brand.primary">
-            Tate McRae
+            {props.name}
           </Text>
         </Flex>
       </VStack>

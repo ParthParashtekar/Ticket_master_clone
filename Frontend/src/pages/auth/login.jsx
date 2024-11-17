@@ -8,8 +8,41 @@ import {
   Checkbox,
   Link,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import useAuthStore from "../../store/useAuthStore";
 
 function SignIn() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const { login, loading } = useAuthStore(); // Get login action from Zustand store
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await login(formData);
+      alert("Login successful!");
+      // Redirect or take further action after successful login
+      navigate("/");
+    } catch (error) {
+      alert("Error during login.");
+    }
+  };
+
   return (
     <Flex
       minH="100vh"
@@ -85,9 +118,22 @@ function SignIn() {
           </Text>
 
           {/* Form */}
-          <Box as="form">
-            <Input placeholder="Email" mb={4} />
-            <Input placeholder="Password" type="password" mb={4} />
+          <Box as="form" onSubmit={handleSubmit}>
+            <Input
+              name="email"
+              value={formData.email}
+              placeholder="Email"
+              mb={4}
+              onChange={handleChange}
+            />
+            <Input
+              name="password"
+              value={formData.password}
+              placeholder="Password"
+              type="password"
+              mb={4}
+              onChange={handleChange}
+            />
 
             {/* Remember Me and Forgot Password */}
             <Flex justifyContent="space-between" alignItems="center" mb={6}>
@@ -96,7 +142,12 @@ function SignIn() {
             </Flex>
 
             {/* Sign In Button */}
-            <Button colorScheme="blue" w="full">
+            <Button
+              colorScheme="blue"
+              w="full"
+              isLoading={loading}
+              type="submit"
+            >
               Sign In
             </Button>
 

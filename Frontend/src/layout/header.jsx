@@ -7,19 +7,23 @@ import {
   Button,
   Icon,
   HStack,
+  Text,
 } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../store/useAuthStore";
 
 const Header = () => {
   const navigate = useNavigate();
+
+  const { user, logout } = useAuthStore();
 
   const handleClick = () => {
     navigate("/login");
   };
   return (
-    <Flex bg="brand.primary" w={"100%"} p={2}>
-      <Flex alignItems="center" w={"100%"}>
+    <Flex bg="brand.primary" w={"100%"} p={2} alignItems="center">
+      <Flex w={"100%"} alignItems="center">
         {/* Logo */}
         <Link href="/" _hover={{ textDecoration: "none" }}>
           <Box fontWeight="bold" fontSize="2xl" color="brand.secondary">
@@ -46,16 +50,27 @@ const Header = () => {
       </Flex>
 
       {/* Sign In / Register Button */}
-      <Flex>
-        <Button
-          variant="link"
-          color="brand.secondary"
-          rightIcon={<Icon as={FaUser} />}
-          onClick={handleClick}
-        >
-          Sign In/Register
-        </Button>
-      </Flex>
+      {user ? (
+        <Flex alignItems="center">
+          <Text colorScheme="brand.secondary" fontWeight={"500"}>
+            Welcome, {user?.firstName || "User"}!
+          </Text>
+          <Button colorScheme="brand.secondary" size="sm" onClick={logout}>
+            Logout
+          </Button>
+        </Flex>
+      ) : (
+        <Flex alignItems="center">
+          <Button
+            variant="link"
+            color="brand.secondary"
+            rightIcon={<Icon as={FaUser} />}
+            onClick={handleClick}
+          >
+            Sign In/Register
+          </Button>
+        </Flex>
+      )}
       {/* Navigation Links */}
     </Flex>
   );

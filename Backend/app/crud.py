@@ -296,6 +296,14 @@ def get_event_by_id(session: Session, event_id: int) -> Optional[Event]:
         )
     return event
 
+def get_events_by_category_id(session: Session, category_id:int)->List[Event]:
+    statement = select(Event).where(Event.CategoryID==category_id) 
+    events = session.exec(statement).all()
+    if not events:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No events found for this category"
+        )
+    return events
 
 def update_event(session: Session, event_id: int, event_data: Event) -> Event:
     event = session.get(Event, event_id)
@@ -315,6 +323,10 @@ def delete_event(session: Session, event_id: int) -> None:
     session.delete(event)
     session.commit()
 
+def get_events_by_event_ids(session: Session, event_id_list: List[int]) -> List[Event]:
+    statement = select(Event).where(Event.EventID.in_(event_id_list))
+    events = session.exec(statement).all()
+    return events
 
 # CRUD Operations for Seat
 def create_seat(session: Session, seat: Seat) -> Seat:

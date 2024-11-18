@@ -38,6 +38,7 @@ from app.crud import (
     delete_venue,
     create_event,
     get_event_by_id,
+    get_events,
     get_events_by_category_id,
     get_events_by_event_ids,
     delete_event,
@@ -68,6 +69,7 @@ from app.crud import (
     update_order,
     update_ticket,
     update_user_event,
+    get_event_sales_summary,
 )
 
 # Initializing APIRouter for handling API routes
@@ -262,7 +264,7 @@ def api_delete_venue(venue_id: int, session: Session = Depends(get_session)):
 def api_create_event(event: Event, session: Session = Depends(get_session)):
     return create_event(session, event)
 
-@router.get("/events", response_model=List[Event], tags=["Events"])
+@router.get("/events", response_model=list[Event], tags=["Events"])
 def api_get_events(session: Session = Depends(get_session)):
     events = get_events(session)
     if not events:
@@ -445,3 +447,10 @@ def api_get_event_list_by_user_id(user_id:int, session:Session=Depends(get_sessi
     if not events:
         raise HTTPException(status_code=404, detail="No events found for this user")
     return events
+
+@router.get("/get_event_sales_summary")
+def api_get_event_sales_summary(session:Session=Depends(get_session)):
+    summary=get_event_sales_summary(session)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+    return summary

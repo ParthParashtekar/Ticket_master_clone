@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlmodel import Session, select
+from sqlmodel import Session, select,text
 from typing import List, Optional
 from fastapi import HTTPException, status
 from app.models import (
@@ -532,3 +532,21 @@ def update_user_event(
     session.commit()
     session.refresh(user_event)
     return user_event
+
+def get_event_sales_summary(session: Session):
+    query = """
+        SELECT users.firstname,
+               users.lastname,
+               events.NAME         AS EventName,
+               categories.NAME     AS Category,
+               SUM(tickets.amount) AS TotalSales
+        FROM   tickets
+               JOIN orders ON tickets.orderid = orders.orderid
+               JOIN users ON orders.userid = users.userid
+               JOIN userevents ON userevents.userid = users.userid
+               JOIN events ON userevents.eventid = events.eventid
+               JOIN categories ON events.categoryid = categories.categoryid
+        GROUP  BY ROLLUP(users.firstname, users.lastname, events.NAME, categories.NAME);
+        """
+    summary = session.exec(text(query))
+    return summary

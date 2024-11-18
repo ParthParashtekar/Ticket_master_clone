@@ -73,7 +73,7 @@ from app.crud import (
     get_events,
     get_users_without_tickets,
     get_events_with_low_tickets,
-    get_highest_revenue_events
+    get_highest_revenue_events,
 )
 
 # Initializing APIRouter for handling API routes
@@ -475,17 +475,20 @@ def api_get_event_sales_summary(session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Summary not found")
     return summary
 
-@router.get("/users/without-tickets")  ##set difference and subquery
+
+@router.get("/users_without-tickets")  ##set difference and subquery
 def users_without_tickets(session=Depends(get_session)):
     users = get_users_without_tickets(session)
     return {"users": users}
 
-@router.get("/events/low-tickets") ##set comparision
+
+@router.get("/events_low-tickets")  ##set comparision
 def events_with_low_tickets(session=Depends(get_session)):
     events = get_events_with_low_tickets(session)
     return {"events": events}
 
-@router.get("/events/highest-revenue") ## with claus and windowing fn
+
+@router.get("/events_highest-revenue")  ## with claus and windowing fn
 def highest_revenue_events(session=Depends(get_session)):
     events = get_highest_revenue_events(session)
     return {"events": events}

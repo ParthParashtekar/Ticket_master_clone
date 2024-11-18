@@ -112,37 +112,6 @@ const Footer = () => {
           </VStack>
         </Flex>
       </Flex>
-
-      {/* Bottom Section - Legal Information */}
-      <Flex borderTopWidth={1} borderColor="gray.700" pt={4}>
-        <Text fontSize="sm" textAlign={{ base: "center", md: "left" }}>
-          By continuing past this page, you agree to our{" "}
-          <Link href="#" color="white">
-            terms of use
-          </Link>
-          .
-        </Text>
-
-        {/* Copyright Info */}
-        <Text fontSize="sm" textAlign={{ base: "center", md: "left" }} mt={2}>
-          &copy; 1999-2024 Ticketmaster. All rights reserved.
-        </Text>
-
-        {/* Additional Links */}
-        <HStack justify={{ base: "center", md: "left" }} mt={2}>
-          <Link href="#" fontSize="sm">
-            Purchase Policy
-          </Link>
-          |
-          <Link href="#" fontSize="sm">
-            Privacy Policy
-          </Link>
-          |
-          <Link href="#" fontSize="sm">
-            Cookie Policy
-          </Link>
-        </HStack>
-      </Flex>
     </Flex>
   );
 };

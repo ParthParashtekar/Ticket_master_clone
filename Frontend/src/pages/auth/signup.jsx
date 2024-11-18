@@ -17,14 +17,14 @@ function SignUp() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    country: "",
-    zipCode: "",
-    dateOfBirth: "",
-    phoneNumber: "",
+    Email: "",
+    PasswordHash: "",
+    FirstName: "",
+    LastName: "",
+    CountryOfResidence: "",
+    ZipCode: "",
+    DateOfBirth: "",
+    PhoneNumber: "",
   });
 
   const { signup, loading } = useAuthStore();
@@ -127,9 +127,9 @@ function SignUp() {
           <Box as="form" onSubmit={handleSubmit}>
             {/* Email */}
             <Input
-              name="email"
+              name="Email"
               placeholder="Email"
-              value={formData.email}
+              value={formData.Email}
               mb={4}
               onChange={handleChange}
             />
@@ -137,9 +137,9 @@ function SignUp() {
             {/* Password */}
             <Input
               placeholder="Password"
-              name="password"
+              name="PasswordHash"
               type="password"
-              value={formData.password}
+              value={formData.PasswordHash}
               mb={4}
               onChange={handleChange}
             />
@@ -147,15 +147,15 @@ function SignUp() {
             {/* First Name / Last Name */}
             <Flex gap={4} mb={4}>
               <Input
-                name="firstName"
-                value={formData.firstName}
+                name="FirstName"
+                value={formData.FirstName}
                 placeholder="First Name"
                 onChange={handleChange}
               />
               <Input
-                name="lastName"
+                name="LastName"
                 placeholder="Last Name"
-                value={formData.lastName}
+                value={formData.LastName}
                 onChange={handleChange}
               />
             </Flex>
@@ -163,16 +163,16 @@ function SignUp() {
             <Flex gap={4} mb={4}>
               <Input
                 placeholder="Date of Birth (MM/DD/YYYY)"
-                name="dateOfBirth"
+                name="DateOfBirth"
                 type="date" // Date input type for better UX
-                value={formData.dateOfBirth}
+                value={formData.DateOfBirth}
                 onChange={handleChange}
               />
               <Input
                 placeholder="Phone Number"
-                name="phoneNumber"
+                name="PhoneNumber"
                 type="tel" // Tel input type for phone number validation
-                value={formData.phoneNumber}
+                value={formData.PhoneNumber}
                 onChange={handleChange}
               />
             </Flex>
@@ -182,15 +182,15 @@ function SignUp() {
               <Select
                 placeholder="Country of Residence"
                 onChange={handleChange}
-                name="country"
-                value={formData.country}
+                name="CountryOfResidence"
+                value={formData.CountryOfResidence}
               >
                 <option value="US">United States</option>
                 {/* Add more countries as needed */}
               </Select>
               <Input
-                name="zipCode"
-                value={formData.zipCode}
+                name="ZipCode"
+                value={formData.ZipCode}
                 placeholder="Zip/Postal Code"
                 onChange={handleChange}
               />

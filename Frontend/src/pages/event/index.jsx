@@ -13,24 +13,30 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import useEventStore from "../../store/eventStore";
 
 export const EventDetails = () => {
   const { eventID } = useParams();
-  const [event, setEvent] = useState(null);
   const navigate = useNavigate();
+
+  const { fetchEventDetails, event, loading, error } = useEventStore();
+
+  const formattedDate = (date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   useEffect(() => {
     // Fetch event details from the backend using eventID
     const fetchEvent = async () => {
       try {
-        // const response = await axios.get(`/api/events/${eventID}`);
-        const event = {
-          name: "event name",
-          imageUrl:
-            "https://assets.teenvogue.com/photos/583264a1680f62177a775ec8/16:9/w_2560%2Cc_limit/GettyImages-624450594.jpg",
-          description: "descrption",
-        };
-        setEvent(event);
+        fetchEventDetails(eventID);
       } catch (error) {
         console.error("Error fetching event details:", error);
       }
@@ -40,7 +46,7 @@ export const EventDetails = () => {
   }, [eventID]); // Run the effect when eventID changes
 
   const handleClick = () => {
-    navigate(`/events/booking/${123}`);
+    navigate(`/events/booking/${event.EventID}`);
   };
 
   return (
@@ -51,7 +57,7 @@ export const EventDetails = () => {
             bgRepeat="no-repeat"
             bgSize="cover"
             bgPosition={"50% 0px"}
-            bgImage={`url(${event.imageUrl})`}
+            bgImage={`url(${event.ImageUrl})`}
             textAlign="center"
             py={16}
             px={8}
@@ -81,16 +87,12 @@ export const EventDetails = () => {
             p={{ sm: "4", md: "8", lg: "10", xl: "10" }}
           >
             <Heading as="h1" fontSize="4xl" mb={4}>
-              {event.name}
+              {event.Name}
             </Heading>
 
             {/* Event Description */}
             <Text fontSize="lg" mb={6} color="gray.600">
-              {event.description}
-              Join us for an unforgettable night of music with some of the best
-              artists in the industry! This concert will feature live
-              performances from top artists across various genres, creating a
-              night full of energy and excitement.
+              {event.Description}
             </Text>
 
             <Flex direction={{ base: "column", md: "row" }} gap={8} mb={8}>
@@ -113,7 +115,7 @@ export const EventDetails = () => {
                   Event Date & Time
                 </Heading>
                 <Text fontSize="md" color="gray.700">
-                  Saturday, December 14, 2024 - 7:00 PM
+                  {formattedDate(event.Date)}
                 </Text>
               </Box>
             </Flex>

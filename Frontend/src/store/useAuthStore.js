@@ -11,7 +11,7 @@ const useAuthStore = create((set) => ({
   signup: async (signupData) => {
     set({ loading: true, error: null });
     try {
-      const response = await api.post("/signup", signupData); // Replace with your actual signup endpoint
+      const response = await api.post("/users", signupData); // Replace with your actual signup endpoint
       set({ user: response.data, loading: false });
       return response.data; // Return data on success
     } catch (error) {

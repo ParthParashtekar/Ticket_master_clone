@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Flex,
@@ -86,16 +86,15 @@ const Home = () => {
         {loading && <Text>Loading...</Text>}
         {error && <Text>Error loading events</Text>}
 
-        {!loading && !error && events.length > 0 ? (
+        {!loading && !error && events?.length > 0 ? (
           events.map((event) => (
             <EventCard
-              key={event.id}
-              title={event.name}
-              description={event.description}
-              venue={event.venue}
-              date={event.date}
-              eventID={event.eventID}
-              // Pass other necessary props to EventCard
+              key={event.EventID}
+              title={event.Name}
+              description={event.Description}
+              date={event.Date}
+              eventID={event.EventID}
+              image={event.ImageUrl}
             />
           ))
         ) : (

@@ -253,6 +253,12 @@ def api_delete_venue(venue_id: int, session: Session = Depends(get_session)):
 def api_create_event(event: Event, session: Session = Depends(get_session)):
     return create_event(session, event)
 
+@router.get("/events", response_model=List[Event], tags=["Events"])
+def api_get_events(session: Session = Depends(get_session)):
+    events = get_events(session)
+    if not events:
+        raise HTTPException(status_code=404, detail="No events present")
+    return events
 
 @router.get("/events/{event_id}", response_model=Event, tags=["Events"])
 def api_get_event(event_id: int, session: Session = Depends(get_session)):

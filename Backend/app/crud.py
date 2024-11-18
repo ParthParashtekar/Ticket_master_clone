@@ -286,10 +286,14 @@ def create_event(session: Session, event: Event) -> Event:
     session.refresh(event)
     return event
 
-
+def get_events(session: Session):
+    statement = select(Event)
+    event= session.exec(statement)
+    return event.all()
+    
 def get_event_by_id(session: Session, event_id: int) -> Optional[Event]:
     event = session.get(Event, event_id)
-    if not event:
+    if not event: 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
         )

@@ -562,4 +562,12 @@ def get_event_sales_summary(session: Session):
         GROUP  BY ROLLUP(user.FirstName, user.LastName, event.Name, category.Name);
         """
     summary = session.exec(text(query))
-    return summary
+    sales_summary = []
+    for row in summary.fetchall():
+        sales_summary.append({"firstname": row[0],
+                "lastname": row[1],
+                "event_name": row[2],
+                "category": row[3],
+                "total_sales": row[4]
+                })
+    return sales_summary

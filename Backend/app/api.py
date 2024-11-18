@@ -38,6 +38,7 @@ from app.crud import (
     delete_venue,
     create_event,
     get_event_by_id,
+    get_events,
     get_events_by_category_id,
     get_events_by_event_ids,
     delete_event,
@@ -68,7 +69,11 @@ from app.crud import (
     update_order,
     update_ticket,
     update_user_event,
+    get_event_sales_summary,
     get_events,
+    get_users_without_tickets,
+    get_events_with_low_tickets,
+    get_highest_revenue_events
 )
 
 # Initializing APIRouter for handling API routes
@@ -82,6 +87,7 @@ router = APIRouter()
 def api_create_user(user: User, session: Session = Depends(get_session)):
     return create_user(session, user)
 
+
 @router.post("/login")
 def api_login(email: str, password: str, session=Depends(get_session)):
     user = get_user_by_email(session, email)
@@ -90,6 +96,7 @@ def api_login(email: str, password: str, session=Depends(get_session)):
     if not User.verify_password(password, user.PasswordHash):
         raise HTTPException(status_code=400, detail="Invalid email or password")
     return user
+
 
 @router.get("/users/{user_id}", response_model=User, tags=["Users"])
 def api_get_user(user_id: int, session: Session = Depends(get_session)):
@@ -459,3 +466,26 @@ def api_get_event_list_by_user_id(
     if not events:
         raise HTTPException(status_code=404, detail="No events found for this user")
     return events
+
+
+@router.get("/get_event_sales_summary")
+def api_get_event_sales_summary(session: Session = Depends(get_session)):
+    summary = get_event_sales_summary(session)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+    return summary
+
+@router.get("/users/without-tickets")  ##set difference and subquery
+def users_without_tickets(session=Depends(get_session)):
+    users = get_users_without_tickets(session)
+    return {"users": users}
+
+@router.get("/events/low-tickets") ##set comparision
+def events_with_low_tickets(session=Depends(get_session)):
+    events = get_events_with_low_tickets(session)
+    return {"events": events}
+
+@router.get("/events/highest-revenue") ## with claus and windowing fn
+def highest_revenue_events(session=Depends(get_session)):
+    events = get_highest_revenue_events(session)
+    return {"events": events}

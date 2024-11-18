@@ -21,9 +21,7 @@ app = FastAPI(
 )
 
 # Defining CORS origins for frontend communication (allows frontend to access API)
-origins = [
-    "http://localhost:3000",  # for frontend origin
-]
+origins = ["http://localhost:3000", "http://localhost:5173"]  # for frontend origin
 
 # Adding CORS middleware to enable cross-origin resource sharing for specified origins
 app.add_middleware(

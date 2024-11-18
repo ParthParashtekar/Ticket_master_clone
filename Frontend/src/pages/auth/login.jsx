@@ -8,8 +8,43 @@ import {
   Checkbox,
   Link,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import useAuthStore from "../../store/useAuthStore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function SignIn() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const navigate = useNavigate();
+
+  const { login, loading } = useAuthStore(); // Get login action from Zustand store
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await login(formData);
+      // Redirect or take further action after successful login
+      navigate("/");
+      toast.success("Signup successful!");
+    } catch (error) {
+      toast.error("Error during signin. Please try again.");
+    }
+  };
+
   return (
     <Flex
       minH="100vh"
@@ -18,6 +53,7 @@ function SignIn() {
       bg="gray.50"
       width={"100%"}
     >
+      <ToastContainer />
       <Box
         maxW="1200px"
         w="full"
@@ -85,9 +121,22 @@ function SignIn() {
           </Text>
 
           {/* Form */}
-          <Box as="form">
-            <Input placeholder="Email" mb={4} />
-            <Input placeholder="Password" type="password" mb={4} />
+          <Box as="form" onSubmit={handleSubmit}>
+            <Input
+              name="email"
+              value={formData.email}
+              placeholder="Email"
+              mb={4}
+              onChange={handleChange}
+            />
+            <Input
+              name="password"
+              value={formData.password}
+              placeholder="Password"
+              type="password"
+              mb={4}
+              onChange={handleChange}
+            />
 
             {/* Remember Me and Forgot Password */}
             <Flex justifyContent="space-between" alignItems="center" mb={6}>
@@ -96,7 +145,12 @@ function SignIn() {
             </Flex>
 
             {/* Sign In Button */}
-            <Button colorScheme="blue" w="full">
+            <Button
+              colorScheme="blue"
+              w="full"
+              isLoading={loading}
+              type="submit"
+            >
               Sign In
             </Button>
 

@@ -3,14 +3,14 @@ import { FaChevronRight } from "react-icons/fa";
 
 import { useState } from "react";
 
-export const EventCard = () => {
+export const EventCard = (props) => {
   const [isHovered, setIsHovered] = useState(false);
   return (
     <Link
       w={{ sm: "100%", md: "45%", lg: "45%", xl: "45%" }}
       minWidth={"300px"}
       borderRadius={"5"}
-      href="/events/123"
+      href={`/events/${props.eventID}`}
     >
       <VStack
         textAlign={"start"}
@@ -28,7 +28,7 @@ export const EventCard = () => {
           bgRepeat="no-repeat"
           bgSize="cover"
           bgPosition={"50% 0px"}
-          bgImage="https://assets.goal.com/images/v3/blt4d50964c91c5450b/NFL_header.jpg?auto=webp&format=pjpg&width=3840&quality=60"
+          bgImage={`url(${props.image})`}
           alignItems={"center"}
           justifyContent={"flex-end"}
           borderRadius={"5"}
@@ -68,9 +68,9 @@ export const EventCard = () => {
           )}
         </Flex>
         <Flex w="100%" textAlign={"start"} flexDirection={"column"} p={"2"}>
-          <Text>Info about the event</Text>
+          <Text>{props.description}</Text>
           <Text fontSize="lg" fontWeight="bold" color="brand.primary">
-            Tate McRae
+            {props.title}
           </Text>
         </Flex>
       </VStack>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -12,15 +12,23 @@ import {
 } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
 import { EventCard } from "../../components/eventCard";
+import useEventStore from "../../store/eventStore";
 
 const Home = () => {
+  const { fetchAllEvents, events, loading, error } = useEventStore();
+
+  // Fetch all events when the component mounts
+  useEffect(() => {
+    fetchAllEvents();
+  }, [fetchAllEvents]);
+
   return (
     <Flex w="100%" flexDirection={"column"}>
       <Flex
         bgRepeat="no-repeat"
         bgSize="cover"
         bgPosition={"50% 0px"}
-        bgImage="url('https://assets.goal.com/images/v3/blt4d50964c91c5450b/NFL_header.jpg?auto=webp&format=pjpg&width=3840&quality=60')"
+        bgImage={`url(${events?.length > 0 ? events[0]?.ImageUrl : ""})`}
         textAlign="center"
         py={16}
         px={8}
@@ -45,27 +53,31 @@ const Home = () => {
         <Flex flexDirection={"column"} maxWidth={"400px"} zIndex={"100"}>
           {/* Disney Logo and Title */}
           <Heading as="h1" fontSize="4xl" mb={4}>
-            Disney Descendants/Zombies
+            {events?.length > 0 ? events[0]?.Name : ""}
           </Heading>
 
           {/* Subtitle */}
           <Text fontSize="xl" mb={6}>
-            VIP Packages Available
+            {events?.length > 0 ? events[0]?.Description : ""}
           </Text>
 
           {/* Find Tickets Button */}
-          <Button
-            size="lg"
-            colorScheme="brand.primary"
-            bg="brand.primary"
-            _hover={{ bg: "brand.primary.900" }}
-            px={8}
-            py={6}
-          >
-            Find Tickets
-          </Button>
+          <Link href={events?.length > 0 ? `events/${events[0]?.EventID}` : ""}>
+            <Button
+              size="lg"
+              colorScheme="brand.primary"
+              bg="brand.primary"
+              _hover={{ bg: "brand.primary.900" }}
+              px={8}
+              py={6}
+            >
+              Find Tickets
+            </Button>
+          </Link>
         </Flex>
       </Flex>
+
+      {/* Events Section */}
       <Flex
         w={"100%"}
         flexWrap={"wrap"}
@@ -73,9 +85,23 @@ const Home = () => {
         gap={"4"}
         justifyContent={"space-around"}
       >
-        <EventCard />
-        <EventCard />
-        <EventCard />
+        {loading && <Text>Loading...</Text>}
+        {error && <Text>Error loading events</Text>}
+
+        {!loading && !error && events?.length > 0 ? (
+          events.map((event) => (
+            <EventCard
+              key={event.EventID}
+              title={event.Name}
+              description={event.Description}
+              date={event.Date}
+              eventID={event.EventID}
+              image={event.ImageUrl}
+            />
+          ))
+        ) : (
+          <Text>No events available</Text>
+        )}
       </Flex>
     </Flex>
   );

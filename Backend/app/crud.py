@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlmodel import Session, select,text
 from typing import List, Optional
 from fastapi import HTTPException, status
+from datetime import datetime
 from app.models import (
     User,
     Role,
@@ -49,7 +50,7 @@ def create_user(session: Session, user: User) -> User:
     if existing_user:
         raise ValueError("User with this email already exists.")
     if not user.RoleID:
-        user.RoleID = 1 
+        user.RoleID = 1
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
     if user.CreatedAt == "":
@@ -76,9 +77,11 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
         )
     return user
 
+
 def get_user_by_email(session: Session, email: str) -> User:
     statement = select(User).where(User.Email == email)
     return session.exec(statement).first()
+
 
 def get_all_users(session: Session) -> List[User]:
     return session.exec(select(User)).all()
@@ -294,27 +297,32 @@ def create_event(session: Session, event: Event) -> Event:
     session.refresh(event)
     return event
 
+
 def get_events(session: Session):
     statement = select(Event)
-    event= session.exec(statement)
+    event = session.exec(statement)
     return event.all()
-    
+
+
 def get_event_by_id(session: Session, event_id: int) -> Optional[Event]:
     event = session.get(Event, event_id)
-    if not event: 
+    if not event:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
         )
     return event
 
-def get_events_by_category_id(session: Session, category_id:int)->List[Event]:
-    statement = select(Event).where(Event.CategoryID==category_id) 
+
+def get_events_by_category_id(session: Session, category_id: int) -> List[Event]:
+    statement = select(Event).where(Event.CategoryID == category_id)
     events = session.exec(statement).all()
     if not events:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No events found for this category"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No events found for this category",
         )
     return events
+
 
 def update_event(session: Session, event_id: int, event_data: Event) -> Event:
     event = session.get(Event, event_id)
@@ -334,10 +342,14 @@ def delete_event(session: Session, event_id: int) -> None:
     session.delete(event)
     session.commit()
 
+
 def get_events_by_event_ids(session: Session, event_id_list: List[int]) -> List[Event]:
-    statement = select(Event).where(Event.EventID.in_(event_id_list))
+    statement = select(Event).where(
+        Event.EventID.in_(event_id_list)
+    )  # set membership query
     events = session.exec(statement).all()
     return events
+
 
 # CRUD Operations for Seat
 def create_seat(session: Session, seat: Seat) -> Seat:

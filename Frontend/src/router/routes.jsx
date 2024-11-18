@@ -20,41 +20,10 @@ export const routes = [
     element: <Home />,
   },
   {
-    path: "/concerts",
-    element: (
-      <Category
-        image="https://media.timeout.com/images/105995698/image.jpg"
-        name="Concerts"
-      />
-    ),
+    path: "/category/:categoryID",
+    element: <Category />,
   },
-  {
-    path: "/sports",
-    element: (
-      <Category
-        image="https://media.timeout.com/images/105995698/image.jpg"
-        name="Sports"
-      />
-    ),
-  },
-  {
-    path: "/arts",
-    element: (
-      <Category
-        image="https://media.timeout.com/images/105995698/image.jpg"
-        name="Arts, Theater & Comedy"
-      />
-    ),
-  },
-  {
-    path: "/family",
-    element: (
-      <Category
-        image="https://media.timeout.com/images/105995698/image.jpg"
-        name="Family"
-      />
-    ),
-  },
+
   {
     path: "/events/:eventID",
     element: <EventDetails />,

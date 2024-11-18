@@ -67,6 +67,7 @@ from app.crud import (
     update_order,
     update_ticket,
     update_user_event,
+    get_events,
 )
 
 # Initializing APIRouter for handling API routes
@@ -253,12 +254,14 @@ def api_delete_venue(venue_id: int, session: Session = Depends(get_session)):
 def api_create_event(event: Event, session: Session = Depends(get_session)):
     return create_event(session, event)
 
-@router.get("/events", response_model=List[Event], tags=["Events"])
+
+@router.get("/events", response_model=list[Event], tags=["Events"])
 def api_get_events(session: Session = Depends(get_session)):
     events = get_events(session)
     if not events:
         raise HTTPException(status_code=404, detail="No events present")
     return events
+
 
 @router.get("/events/{event_id}", response_model=Event, tags=["Events"])
 def api_get_event(event_id: int, session: Session = Depends(get_session)):
@@ -267,12 +270,18 @@ def api_get_event(event_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Event not found")
     return event
 
-@router.get("/events/byCategory/{category_id}", response_model=list[Event], tags=["Events"])
-def api_get_events_by_category_id(category_id: int, session: Session = Depends(get_session)):
+
+@router.get(
+    "/events/byCategory/{category_id}", response_model=list[Event], tags=["Events"]
+)
+def api_get_events_by_category_id(
+    category_id: int, session: Session = Depends(get_session)
+):
     events = get_events_by_category_id(session, category_id)
     if not events:
         raise HTTPException(status_code=404, detail="Event not found")
     return events
+
 
 @router.put("/events/{event_id}", response_model=Event, tags=["Events"])
 def api_update_event(
@@ -427,8 +436,13 @@ def api_update_user_event(
 ):
     return update_user_event(session, user_id, event_id, user_event)
 
-@router.get("/event_list_by_user_id/{user_id}", response_model = list[Event], tags=["UserEvents"])
-def api_get_event_list_by_user_id(user_id:int, session:Session=Depends(get_session)):
+
+@router.get(
+    "/event_list_by_user_id/{user_id}", response_model=list[Event], tags=["UserEvents"]
+)
+def api_get_event_list_by_user_id(
+    user_id: int, session: Session = Depends(get_session)
+):
     event_id_list = get_user_events_by_user_id(session, user_id)
     if not event_id_list:
         raise HTTPException(status_code=404, detail="No events found for this user")

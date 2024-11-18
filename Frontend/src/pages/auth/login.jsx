@@ -11,6 +11,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function SignIn() {
   const [formData, setFormData] = useState({
@@ -35,11 +37,11 @@ function SignIn() {
 
     try {
       await login(formData);
-      alert("Login successful!");
       // Redirect or take further action after successful login
       navigate("/");
+      toast.success("Signup successful!");
     } catch (error) {
-      alert("Error during login.");
+      toast.error("Error during signin. Please try again.");
     }
   };
 
@@ -51,6 +53,7 @@ function SignIn() {
       bg="gray.50"
       width={"100%"}
     >
+      <ToastContainer />
       <Box
         maxW="1200px"
         w="full"

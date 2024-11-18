@@ -33,16 +33,16 @@ const Header = () => {
 
         <Flex>
           <HStack spacing={6} ml={8} display={{ base: "none", md: "flex" }}>
-            <Link href="/concerts" color="brand.secondary" fontSize="md">
+            <Link href={`/category/${1}`} color="brand.secondary" fontSize="md">
               Concerts
             </Link>
-            <Link href="/sports" color="brand.secondary" fontSize="md">
+            <Link href={`/category/${2}`} color="brand.secondary" fontSize="md">
               Sports
             </Link>
-            <Link href="/arts" color="brand.secondary" fontSize="md">
+            <Link href={`/category/${3}`} color="brand.secondary" fontSize="md">
               Arts, Theater & Comedy
             </Link>
-            <Link href="/family" color="brand.secondary" fontSize="md">
+            <Link href={`/category/${4}`} color="brand.secondary" fontSize="md">
               Family
             </Link>
           </HStack>

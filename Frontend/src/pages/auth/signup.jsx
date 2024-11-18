@@ -12,6 +12,8 @@ import {
 import { useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -42,11 +44,24 @@ function SignUp() {
     console.log("Submit", formData);
     try {
       await signup(formData);
-      alert("Signup successful!");
       // Redirect or take further action after successful signup
+      // Show success notification
+      toast.success("Signup successful!");
+
+      // Clear form data or redirect user after successful signup
+      setFormData({
+        Email: "",
+        PasswordHash: "",
+        FirstName: "",
+        LastName: "",
+        CountryOfResidence: "",
+        ZipCode: "",
+        DateOfBirth: "",
+        PhoneNumber: "",
+      });
       navigate("/");
     } catch (error) {
-      alert("Error during signup.");
+      toast.error("Error during signup. Please try again.");
     }
   };
 
@@ -58,6 +73,7 @@ function SignUp() {
       bg="gray.50"
       width={"100%"}
     >
+      <ToastContainer />
       <Box
         maxW="1200px"
         w="full"

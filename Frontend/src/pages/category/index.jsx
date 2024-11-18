@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Flex,
@@ -11,8 +11,18 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { EventCard } from "../../components/eventCard";
+import useEventStore from "../../store/eventStore";
+import { useParams } from "react-router-dom";
 
 export const Category = (props) => {
+  const { fetchEventsByCategoryId, events, loading, error } = useEventStore();
+  const { categoryID } = useParams();
+
+  // Fetch all events when the component mounts
+  useEffect(() => {
+    fetchEventsByCategoryId(categoryID);
+  }, [categoryID]);
+
   return (
     <Flex w="100%" flexDirection={"column"}>
       <Flex
@@ -55,10 +65,11 @@ export const Category = (props) => {
             zIndex: "-1",
           }}
         >
-          {props.name} Tickets
+          Events
         </Text>
       </Flex>
 
+      {/* Events Section */}
       <Flex
         w={"100%"}
         flexWrap={"wrap"}
@@ -66,9 +77,23 @@ export const Category = (props) => {
         gap={"4"}
         justifyContent={"space-around"}
       >
-        <EventCard />
-        <EventCard />
-        <EventCard />
+        {loading && <Text>Loading...</Text>}
+        {error && <Text>Error loading events</Text>}
+
+        {!loading && !error && events?.length > 0 ? (
+          events.map((event) => (
+            <EventCard
+              key={event.EventID}
+              title={event.Name}
+              description={event.Description}
+              date={event.Date}
+              eventID={event.EventID}
+              image={event.ImageUrl}
+            />
+          ))
+        ) : (
+          <Text>No events available</Text>
+        )}
       </Flex>
     </Flex>
   );

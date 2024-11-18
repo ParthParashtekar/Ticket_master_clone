@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -20,6 +20,9 @@ const Home = () => {
   // Fetch all events when the component mounts
   useEffect(() => {
     fetchAllEvents();
+    if (events?.length > 0) {
+      setMainEvent(events);
+    }
   }, [fetchAllEvents]);
 
   return (
@@ -28,7 +31,7 @@ const Home = () => {
         bgRepeat="no-repeat"
         bgSize="cover"
         bgPosition={"50% 0px"}
-        bgImage="url('https://assets.goal.com/images/v3/blt4d50964c91c5450b/NFL_header.jpg?auto=webp&format=pjpg&width=3840&quality=60')"
+        bgImage={`url(${events?.length > 0 ? events[0]?.ImageUrl : ""})`}
         textAlign="center"
         py={16}
         px={8}
@@ -53,25 +56,27 @@ const Home = () => {
         <Flex flexDirection={"column"} maxWidth={"400px"} zIndex={"100"}>
           {/* Disney Logo and Title */}
           <Heading as="h1" fontSize="4xl" mb={4}>
-            Disney Descendants/Zombies
+            {events?.length > 0 ? events[0]?.Name : ""}
           </Heading>
 
           {/* Subtitle */}
           <Text fontSize="xl" mb={6}>
-            VIP Packages Available
+            {events?.length > 0 ? events[0]?.Description : ""}
           </Text>
 
           {/* Find Tickets Button */}
-          <Button
-            size="lg"
-            colorScheme="brand.primary"
-            bg="brand.primary"
-            _hover={{ bg: "brand.primary.900" }}
-            px={8}
-            py={6}
-          >
-            Find Tickets
-          </Button>
+          <Link href={events?.length > 0 ? `events/${events[0]?.EventID}` : ""}>
+            <Button
+              size="lg"
+              colorScheme="brand.primary"
+              bg="brand.primary"
+              _hover={{ bg: "brand.primary.900" }}
+              px={8}
+              py={6}
+            >
+              Find Tickets
+            </Button>
+          </Link>
         </Flex>
       </Flex>
 

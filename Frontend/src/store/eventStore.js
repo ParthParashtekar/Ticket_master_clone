@@ -22,7 +22,7 @@ const useEventStore = create((set) => ({
   fetchEventsByCategoryId: async (categoryId) => {
     set({ loading: true, error: null });
     try {
-      const response = await api.get(`/events/category/${categoryId}`); // Replace with actual endpoint
+      const response = await api.get(`/events/byCategory/${categoryId}`); // Replace with actual endpoint
       set({ events: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });

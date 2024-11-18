@@ -17,6 +17,7 @@ from app.models import (
 from app.crud import (
     create_user,
     get_user_by_id,
+    get_user_by_email,
     get_all_users,
     delete_user,
     create_role,
@@ -81,6 +82,14 @@ router = APIRouter()
 def api_create_user(user: User, session: Session = Depends(get_session)):
     return create_user(session, user)
 
+@router.post("/login")
+def api_login(email: str, password: str, session=Depends(get_session)):
+    user = get_user_by_email(session, email)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+    if not User.verify_password(password, user.PasswordHash):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+    return user
 
 @router.get("/users/{user_id}", response_model=User, tags=["Users"])
 def api_get_user(user_id: int, session: Session = Depends(get_session)):

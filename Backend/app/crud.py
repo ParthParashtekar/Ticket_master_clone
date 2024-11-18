@@ -46,6 +46,9 @@ def create_user(session: Session, user: User) -> User:
             "PasswordHash",
         ],
     )
+    existing_user = session.exec(select(User).where(User.Email == user.Email)).first()
+    if existing_user:
+        raise ValueError("User with this email already exists.")
     if not user.RoleID:
         user.RoleID = 1
     if isinstance(user.DateOfBirth, str):
@@ -54,6 +57,8 @@ def create_user(session: Session, user: User) -> User:
         user.CreatedAt = None
     if user.UpdatedAt == "":
         user.UpdatedAt = None
+
+    user.PasswordHash = User.hash_password(user.PasswordHash)
 
     session.add(user)
     session.commit()
@@ -72,6 +77,9 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
         )
     return user
 
+def get_user_by_email(session: Session, email: str) -> User:
+    statement = select(User).where(User.Email == email)
+    return session.exec(statement).first()
 
 def get_all_users(session: Session) -> List[User]:
     return session.exec(select(User)).all()

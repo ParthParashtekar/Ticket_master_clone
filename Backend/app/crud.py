@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlmodel import Session, select, text
+from sqlmodel import Session, select, text, func
 from typing import List, Optional
 from fastapi import HTTPException, status
 from datetime import datetime
@@ -571,3 +571,42 @@ def get_event_sales_summary(session: Session):
                 "total_sales": row[4]
                 })
     return sales_summary
+
+def get_events_with_low_tickets(session: Session):
+    query = select(Event).where(Event.AvailableTickets < (Event.TotalTickets * 0.1))##set comparision
+    result = session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="No such event found")
+    return result
+
+def get_highest_revenue_events(session: Session): ## with claus and windowing fn
+    with_event_revenue = (
+        select(
+            Event.EventID,
+            Event.Name,
+            func.sum(Ticket.Amount).label("total_revenue")
+        )
+        .join(Event, Ticket.OrderID == Event.EventID)
+        .group_by(Event.EventID, Event.Name)
+        .cte("event_revenue")
+    )
+    query = (
+        select(with_event_revenue)
+        .where(with_event_revenue.c.total_revenue == select(func.max(with_event_revenue.c.total_revenue)))
+    )
+    result = session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="something went wrong")
+    return result
+
+def get_users_without_tickets(session: Session): ##set difference and subquery
+    subquery = (
+        select(Order.UserID)
+        .join(Ticket, Ticket.OrderID == Order.OrderID)
+        .distinct()
+    )
+    query = select(User).where(User.UserID.not_in(subquery))
+    result= session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="there are no such users")
+    return result

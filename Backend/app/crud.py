@@ -77,9 +77,11 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
         )
     return user
 
+
 def get_user_by_email(session: Session, email: str) -> User:
     statement = select(User).where(User.Email == email)
     return session.exec(statement).first()
+
 
 def get_all_users(session: Session) -> List[User]:
     return session.exec(select(User)).all()
@@ -342,7 +344,9 @@ def delete_event(session: Session, event_id: int) -> None:
 
 
 def get_events_by_event_ids(session: Session, event_id_list: List[int]) -> List[Event]:
-    statement = select(Event).where(Event.EventID.in_(event_id_list))
+    statement = select(Event).where(
+        Event.EventID.in_(event_id_list)
+    )  # set membership query
     events = session.exec(statement).all()
     return events
 

@@ -20,9 +20,6 @@ const Home = () => {
   // Fetch all events when the component mounts
   useEffect(() => {
     fetchAllEvents();
-    if (events?.length > 0) {
-      setMainEvent(events);
-    }
   }, [fetchAllEvents]);
 
   return (

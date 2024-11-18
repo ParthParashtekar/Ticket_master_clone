@@ -52,10 +52,10 @@ const Header = () => {
       {/* Sign In / Register Button */}
       {user ? (
         <Flex alignItems="center">
-          <Text colorScheme="brand.secondary" fontWeight={"500"}>
-            Welcome, {user?.firstName || "User"}!
+          <Text color="brand.secondary" fontWeight={"900"}>
+            Welcome, {user?.FirstName || "User"}!
           </Text>
-          <Button colorScheme="brand.secondary" size="sm" onClick={logout}>
+          <Button colorScheme="gray" size="sm" onClick={logout}>
             Logout
           </Button>
         </Flex>

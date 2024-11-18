@@ -4,6 +4,8 @@ from datetime import datetime, date, timezone
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 # List of Schema Models
 # Defining a Role model representing role table in the database
 class Role(SQLModel, table=True):
@@ -37,7 +39,7 @@ class User(SQLModel, table=True):
     @staticmethod
     def hash_password(password: str) -> str:
         return pwd_context.hash(password)
-    
+
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         return pwd_context.verify(plain_password, hashed_password)

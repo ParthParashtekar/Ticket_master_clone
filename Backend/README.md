@@ -6,8 +6,6 @@ This is the project for Database organisation CS-425-02, built using **FastAPI**
 
 Please follow the instructions below to set up and run the project locally.
 
-## Backend
-
 ### Prerequisites
 
 - Python 3.8 or higher
@@ -63,61 +61,13 @@ DATABASE_URL=<actual database url(e.g.-mysql+pymysql://username:password@host:po
 
 To start the application, use the following command:
 
+Navigate to the project directory and start the server:
+
 ```bash
+cd Backend
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 7. Access the API Documentation
 
-Once the application is running, you can access the API documentation using Swagger UI at the following URL: [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-# Frontend
-
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-1. Node.js (v14 or higher)
-2. npm
-
-## Installation
-
-Navigate to the project directory:
-
-```bash
-cd Frontend
-```
-
-Install dependencies:
-Using npm:
-
-```bash
-npm install
-```
-
-### Running the Application
-
-To start the development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at [http://localhost:5173/](http://localhost:5173/)
-
-## Project Structure
-
-```text
-frontend/
-├── public/ # Public assets (index.html, images, etc.)
-├── src/
-│ ├── components/            # Reusable components (EventCard, Header, etc.)
-│ ├── pages/                 # Pages (Home, Login, Signup)
-│ ├── store/                 # Zustand stores for state management
-│ ├── api/                   # Axios instance for API calls
-│ ├── App.jsx                # Main app component
-│ └── main.jsx               # Entry point for React app
-└── package.json             # Project configuration and dependencies
-```
+Once the application is running, you can access the API documentation using Swagger UI at the following URL: http://localhost:8000/docs

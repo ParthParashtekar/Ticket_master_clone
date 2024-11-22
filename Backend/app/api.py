@@ -17,6 +17,7 @@ from app.models import (
 from app.crud import (
     create_user,
     get_user_by_id,
+    get_user_by_email,
     get_all_users,
     delete_user,
     create_role,
@@ -37,6 +38,9 @@ from app.crud import (
     delete_venue,
     create_event,
     get_event_by_id,
+    get_events,
+    get_events_by_category_id,
+    get_events_by_event_ids,
     delete_event,
     create_seat,
     get_all_seats,
@@ -65,6 +69,11 @@ from app.crud import (
     update_order,
     update_ticket,
     update_user_event,
+    get_event_sales_summary,
+    get_events,
+    get_users_without_tickets,
+    get_events_with_low_tickets,
+    get_highest_revenue_events,
 )
 
 # Initializing APIRouter for handling API routes
@@ -77,6 +86,16 @@ router = APIRouter()
 @router.post("/users/", response_model=User, tags=["Users"])
 def api_create_user(user: User, session: Session = Depends(get_session)):
     return create_user(session, user)
+
+
+@router.post("/login")
+def api_login(email: str, password: str, session=Depends(get_session)):
+    user = get_user_by_email(session, email)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+    if not User.verify_password(password, user.PasswordHash):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+    return user
 
 
 @router.get("/users/{user_id}", response_model=User, tags=["Users"])
@@ -252,12 +271,32 @@ def api_create_event(event: Event, session: Session = Depends(get_session)):
     return create_event(session, event)
 
 
+@router.get("/events", response_model=list[Event], tags=["Events"])
+def api_get_events(session: Session = Depends(get_session)):
+    events = get_events(session)
+    if not events:
+        raise HTTPException(status_code=404, detail="No events present")
+    return events
+
+
 @router.get("/events/{event_id}", response_model=Event, tags=["Events"])
 def api_get_event(event_id: int, session: Session = Depends(get_session)):
     event = get_event_by_id(session, event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     return event
+
+
+@router.get(
+    "/events/byCategory/{category_id}", response_model=list[Event], tags=["Events"]
+)
+def api_get_events_by_category_id(
+    category_id: int, session: Session = Depends(get_session)
+):
+    events = get_events_by_category_id(session, category_id)
+    if not events:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return events
 
 
 @router.put("/events/{event_id}", response_model=Event, tags=["Events"])
@@ -412,3 +451,44 @@ def api_update_user_event(
     session: Session = Depends(get_session),
 ):
     return update_user_event(session, user_id, event_id, user_event)
+
+
+@router.get(
+    "/event_list_by_user_id/{user_id}", response_model=list[Event], tags=["UserEvents"]
+)
+def api_get_event_list_by_user_id(
+    user_id: int, session: Session = Depends(get_session)
+):
+    event_id_list = get_user_events_by_user_id(session, user_id)
+    if not event_id_list:
+        raise HTTPException(status_code=404, detail="No events found for this user")
+    events = get_events_by_event_ids(session, event_id_list)
+    if not events:
+        raise HTTPException(status_code=404, detail="No events found for this user")
+    return events
+
+
+@router.get("/get_event_sales_summary")
+def api_get_event_sales_summary(session: Session = Depends(get_session)):
+    summary = get_event_sales_summary(session)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Summary not found")
+    return summary
+
+
+@router.get("/users_without-tickets")  ##set difference and subquery
+def users_without_tickets(session=Depends(get_session)):
+    users = get_users_without_tickets(session)
+    return {"users": users}
+
+
+@router.get("/events_low-tickets")  ##set comparision
+def events_with_low_tickets(session=Depends(get_session)):
+    events = get_events_with_low_tickets(session)
+    return {"events": events}
+
+
+@router.get("/events_highest-revenue")  ## with claus and windowing fn
+def highest_revenue_events(session=Depends(get_session)):
+    events = get_highest_revenue_events(session)
+    return {"events": events}

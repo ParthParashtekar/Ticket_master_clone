@@ -1,7 +1,8 @@
 from datetime import datetime
-from sqlmodel import Session, select
+from sqlmodel import Session, select, text, func
 from typing import List, Optional
 from fastapi import HTTPException, status
+from datetime import datetime
 from app.models import (
     User,
     Role,
@@ -43,17 +44,21 @@ def create_user(session: Session, user: User) -> User:
             "LastName",
             "DateOfBirth",
             "PasswordHash",
-            "RoleID",
-            "UserID",
         ],
     )
-
+    existing_user = session.exec(select(User).where(User.Email == user.Email)).first()
+    if existing_user:
+        raise ValueError("User with this email already exists.")
+    if not user.RoleID:
+        user.RoleID = 1
     if isinstance(user.DateOfBirth, str):
         user.DateOfBirth = datetime.strptime(user.DateOfBirth, "%Y-%m-%d").date()
     if user.CreatedAt == "":
         user.CreatedAt = None
     if user.UpdatedAt == "":
         user.UpdatedAt = None
+
+    user.PasswordHash = User.hash_password(user.PasswordHash)
 
     session.add(user)
     session.commit()
@@ -71,6 +76,11 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[User]:
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
     return user
+
+
+def get_user_by_email(session: Session, email: str) -> User:
+    statement = select(User).where(User.Email == email)
+    return session.exec(statement).first()
 
 
 def get_all_users(session: Session) -> List[User]:
@@ -288,6 +298,12 @@ def create_event(session: Session, event: Event) -> Event:
     return event
 
 
+def get_events(session: Session):
+    statement = select(Event)
+    event = session.exec(statement)
+    return event.all()
+
+
 def get_event_by_id(session: Session, event_id: int) -> Optional[Event]:
     event = session.get(Event, event_id)
     if not event:
@@ -295,6 +311,17 @@ def get_event_by_id(session: Session, event_id: int) -> Optional[Event]:
             status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
         )
     return event
+
+
+def get_events_by_category_id(session: Session, category_id: int) -> List[Event]:
+    statement = select(Event).where(Event.CategoryID == category_id)
+    events = session.exec(statement).all()
+    if not events:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No events found for this category",
+        )
+    return events
 
 
 def update_event(session: Session, event_id: int, event_data: Event) -> Event:
@@ -314,6 +341,14 @@ def delete_event(session: Session, event_id: int) -> None:
     event = get_event_by_id(session, event_id)
     session.delete(event)
     session.commit()
+
+
+def get_events_by_event_ids(session: Session, event_id_list: List[int]) -> List[Event]:
+    statement = select(Event).where(
+        Event.EventID.in_(event_id_list)
+    )  # set membership query
+    events = session.exec(statement).all()
+    return events
 
 
 # CRUD Operations for Seat
@@ -509,3 +544,69 @@ def update_user_event(
     session.commit()
     session.refresh(user_event)
     return user_event
+
+
+def get_event_sales_summary(session: Session):
+    query = """
+        SELECT user.FirstName,
+               user.LastName,
+               event.Name        AS EventName,
+               category.Name     AS Category,
+               SUM(ticket.Amount) AS TotalSales
+        FROM  ticket 
+        JOIN `order` ON ticket.OrderID = `order`.OrderID
+               JOIN user ON `order`.UserID = user.UserID
+               JOIN userevent ON userevent.UserID = user.UserID
+               JOIN event ON userevent.EventID = event.EventID
+               JOIN category ON event.CategoryID = category.CategoryID
+        GROUP  BY ROLLUP(user.FirstName, user.LastName, event.Name, category.Name);
+        """
+    summary = session.exec(text(query))
+    sales_summary = []
+    for row in summary.fetchall():
+        sales_summary.append({"firstname": row[0],
+                "lastname": row[1],
+                "event_name": row[2],
+                "category": row[3],
+                "total_sales": row[4]
+                })
+    return sales_summary
+
+def get_events_with_low_tickets(session: Session):
+    query = select(Event).where(Event.AvailableTickets < (Event.TotalTickets * 0.1))##set comparision
+    result = session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="No such event found")
+    return result
+
+def get_highest_revenue_events(session: Session): ## with claus and windowing fn
+    with_event_revenue = (
+        select(
+            Event.EventID,
+            Event.Name,
+            func.sum(Ticket.Amount).label("total_revenue")
+        )
+        .join(Event, Ticket.OrderID == Event.EventID)
+        .group_by(Event.EventID, Event.Name)
+        .cte("event_revenue")
+    )
+    query = (
+        select(with_event_revenue)
+        .where(with_event_revenue.c.total_revenue == select(func.max(with_event_revenue.c.total_revenue)))
+    )
+    result = session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="something went wrong")
+    return result
+
+def get_users_without_tickets(session: Session): ##set difference and subquery
+    subquery = (
+        select(Order.UserID)
+        .join(Ticket, Ticket.OrderID == Order.OrderID)
+        .distinct()
+    )
+    query = select(User).where(User.UserID.not_in(subquery))
+    result= session.exec(query).all()
+    if not result:
+        raise HTTPException(status_code=404,detail="there are no such users")
+    return result
